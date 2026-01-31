@@ -1,0 +1,2050 @@
+<!-- ==========================================
+     RUBBER BANDITS - FTC #17288
+     Professional Redesign
+     ========================================== -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rubber Bandits • FTC #17288</title>
+  
+  <!-- Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================
+       RESET + BASE
+       ========================= */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    
+    body {
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      color: rgba(255, 255, 255, 0.92);
+      line-height: 1.6;
+      background: #050a07;
+      overflow-x: hidden;
+    }
+
+    /* Animated gradient background */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(16, 85, 45, 0.15), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(8, 60, 32, 0.12), transparent),
+        radial-gradient(ellipse 100% 80% at 50% 100%, rgba(4, 40, 20, 0.2), transparent),
+        linear-gradient(180deg, #050a07 0%, #071a10 50%, #040806 100%);
+      z-index: -2;
+      animation: bgShift 20s ease-in-out infinite alternate;
+    }
+
+    @keyframes bgShift {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(10deg); }
+    }
+
+    /* Noise texture overlay */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    :root {
+      --max: 1200px;
+      --pad: 32px;
+      
+      /* Refined color palette */
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.4);
+      --mint: #6ee7b7;
+      --forest: #064e3b;
+      --deep: #022c22;
+      
+      --glass: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-hover: rgba(255, 255, 255, 0.06);
+      
+      --text: rgba(255, 255, 255, 0.92);
+      --text-muted: rgba(255, 255, 255, 0.6);
+      --text-dim: rgba(255, 255, 255, 0.4);
+    }
+
+    .container {
+      width: min(var(--max), 100%);
+      margin: 0 auto;
+      padding: 0 var(--pad);
+    }
+
+    /* =========================
+       SCROLL REVEAL ANIMATIONS
+       ========================= */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* =========================
+       TOP NAV (fixed)
+       ========================= */
+    .topbar {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 100;
+      padding: 16px 0;
+      transition: background 0.4s ease, backdrop-filter 0.4s ease, padding 0.3s ease;
+    }
+
+    .topbar.scrolled {
+      background: rgba(5, 10, 7, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .topbar__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: transform 0.3s ease;
+    }
+
+    .brand:hover {
+      transform: scale(1.02);
+    }
+
+    .brand__logo {
+      height: 38px;
+      width: auto;
+      filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.3));
+      transition: filter 0.3s ease;
+    }
+
+    .brand:hover .brand__logo {
+      filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.5));
+    }
+
+    .brand__name {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .brand__pill {
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--mint);
+      letter-spacing: 0.02em;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav a {
+      position: relative;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 14px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .nav a::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: inherit;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+    }
+
+    .nav a:hover::before {
+      opacity: 1;
+    }
+
+    /* =========================
+       HERO (TITLE PAGE)
+       ========================= */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero--title {
+      background:
+        radial-gradient(ellipse 120% 60% at 50% 30%, rgba(16, 185, 129, 0.05), transparent),
+        radial-gradient(ellipse 80% 50% at 20% 80%, rgba(6, 78, 59, 0.2), transparent),
+        url("assets/forest-bg.png") center / cover no-repeat;
+    }
+
+    .hero--title::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, 
+        rgba(5, 10, 7, 0.85) 0%, 
+        rgba(5, 10, 7, 0.7) 40%,
+        rgba(5, 10, 7, 0.75) 70%,
+        rgba(5, 10, 7, 0.95) 100%
+      );
+      z-index: 1;
+    }
+
+    /* Ambient floating particles */
+    .hero-particles {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(16, 185, 129, 0.4);
+      border-radius: 50%;
+      animation: float 15s infinite ease-in-out;
+    }
+
+    .particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 18s; }
+    .particle:nth-child(2) { left: 20%; animation-delay: 2s; animation-duration: 14s; }
+    .particle:nth-child(3) { left: 35%; animation-delay: 4s; animation-duration: 20s; }
+    .particle:nth-child(4) { left: 50%; animation-delay: 1s; animation-duration: 16s; }
+    .particle:nth-child(5) { left: 65%; animation-delay: 3s; animation-duration: 22s; }
+    .particle:nth-child(6) { left: 80%; animation-delay: 5s; animation-duration: 17s; }
+    .particle:nth-child(7) { left: 90%; animation-delay: 2.5s; animation-duration: 19s; }
+
+    /* Reduce particles on mobile */
+    @media (max-width: 768px) {
+      .particle:nth-child(n+4) { display: none; }
+      .particle { width: 3px; height: 3px; }
+    }
+
+    @keyframes float {
+      0%, 100% { 
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% { opacity: 1; transform: translateY(80vh) scale(1); }
+      90% { opacity: 1; transform: translateY(10vh) scale(1); }
+      100% { 
+        transform: translateY(-10vh) scale(0);
+        opacity: 0;
+      }
+    }
+
+    .hero__inner {
+      position: relative;
+      z-index: 3;
+      width: min(var(--max), 100%);
+      margin: 0 auto;
+      padding: 160px var(--pad) 120px;
+    }
+
+    .hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 30px;
+      margin-bottom: 24px;
+      animation: badgePulse 3s ease-in-out infinite;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.3); }
+      50% { box-shadow: 0 0 20px 5px rgba(16, 185, 129, 0.1); }
+    }
+
+    .hero__badge-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero__badge-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--mint);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .hero__title {
+      margin: 0 0 20px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 900;
+      font-size: clamp(52px, 8vw, 100px);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      background: linear-gradient(
+        135deg, 
+        #ffffff 0%, 
+        rgba(255, 255, 255, 0.9) 30%,
+        var(--mint) 70%,
+        var(--emerald) 100%
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 4px 30px rgba(16, 185, 129, 0.2));
+    }
+
+    .hero__sub {
+      margin: 0 0 36px;
+      color: var(--text-muted);
+      font-size: 18px;
+      font-weight: 400;
+      max-width: 52ch;
+      line-height: 1.7;
+    }
+
+    .hero__cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .btn:hover::before { opacity: 1; }
+    .btn:active { transform: scale(0.97); }
+
+    .btn--primary {
+      background: linear-gradient(135deg, var(--emerald), #059669);
+      color: white;
+      box-shadow: 
+        0 4px 20px rgba(16, 185, 129, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .btn--primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 8px 30px rgba(16, 185, 129, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .btn--ghost {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn--ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      left: 50%;
+      bottom: 40px;
+      transform: translateX(-50%);
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      animation: arrowBob 2s ease-in-out infinite;
+    }
+
+    .scroll-indicator__arrow {
+      width: 24px;
+      height: 24px;
+      border-left: 2px solid rgba(255, 255, 255, 0.35);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+      transform: rotate(-45deg);
+      transition: border-color 0.3s ease;
+    }
+
+    .scroll-indicator:hover .scroll-indicator__arrow {
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    @keyframes arrowBob {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(10px); }
+    }
+
+    /* =========================
+       SECTIONS
+       ========================= */
+    section.content {
+      position: relative;
+      padding: 120px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--emerald);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      margin: 0 0 16px;
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff, rgba(255,255,255,0.7));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-sub {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 60ch;
+      margin: 0 auto;
+    }
+
+    /* =========================
+       GLASS CARDS
+       ========================= */
+    .glass-card {
+      position: relative;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.02) 100%
+      );
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 32px;
+      backdrop-filter: blur(20px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(16, 185, 129, 0.2);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 60px rgba(16, 185, 129, 0.05);
+    }
+
+    .glass-card h3 {
+      margin: 0 0 12px;
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .glass-card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* About split layout */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 0.6fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 860px) {
+      .about-grid { grid-template-columns: 1fr; }
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: 30px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--mint);
+      font-size: 12px;
+      font-weight: 600;
+      margin: 6px 6px 0 0;
+      transition: all 0.3s ease;
+    }
+
+    .pill:hover {
+      background: rgba(16, 185, 129, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .facts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: 12px;
+}
+
+    .fact-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .fact-item:hover {
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .fact-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(16, 185, 129, 0.15);
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    .fact-content strong {
+      display: block;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .fact-content span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* =========================
+       TEAM SECTION
+       ========================= */
+    .team-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .team-head__title {
+      margin: 0;
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff, rgba(255,255,255,0.7));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .team-head__note {
+      margin: 0;
+      max-width: 320px;
+      text-align: right;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .team-head { flex-direction: column; align-items: flex-start; }
+      .team-head__note { text-align: left; }
+    }
+
+    /* Team pillars */
+    .team3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    @media (max-width: 1000px) {
+      .team3 { grid-template-columns: 1fr; }
+    }
+
+    .pillar {
+      position: relative;
+      border-radius: 28px;
+      padding: 28px;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.04) 0%,
+        rgba(255, 255, 255, 0.01) 100%
+      );
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .pillar::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 28px;
+      right: 28px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--emerald), transparent);
+      border-radius: 0 0 3px 3px;
+      opacity: 0.5;
+    }
+
+    .pillar__head {
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .pillar__icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 14px;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .pillar__title {
+      margin: 0 0 8px;
+      font-family: 'Syne', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .pillar__sub {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .pillar__list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Person cards */
+    .person {
+      position: relative;
+      border-radius: 16px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: default;
+    }
+
+    .person:hover {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.2);
+      transform: translateX(6px);
+    }
+
+    .person__name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .person__role {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--emerald);
+    }
+
+    .person__desc {
+      margin-top: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .person:hover .person__desc {
+      max-height: 120px;
+      opacity: 1;
+    }
+
+    /* =========================
+       COACHES
+       ========================= */
+    .coaches-box {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .coaches-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .coach-card {
+      position: relative;
+      border-radius: 20px;
+      padding: 28px 32px;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.04) 0%,
+        rgba(255, 255, 255, 0.01) 100%
+      );
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .coach-card:hover {
+      border-color: rgba(16, 185, 129, 0.2);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .coach-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .coach-role {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--emerald);
+    }
+
+    .coach-desc {
+      margin-top: 16px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-muted);
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .coach-card:hover .coach-desc {
+      max-height: 200px;
+      opacity: 1;
+    }
+
+    /* =========================
+       ROBOT SECTION
+       ========================= */
+    .robot-showcase {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .robot-card {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.04) 0%,
+        rgba(255, 255, 255, 0.01) 100%
+      );
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .robot-card:hover {
+      border-color: rgba(16, 185, 129, 0.2);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .robot-image-wrap {
+      position: relative;
+      padding: 40px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.2), transparent);
+    }
+
+    .robot-image {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
+      margin: 0 auto;
+      border-radius: 16px;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .robot-card:hover .robot-image {
+      transform: scale(1.03);
+    }
+
+    .robot-info {
+      padding: 0 40px 40px;
+    }
+
+    .robot-desc {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text-muted);
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .robot-card:hover .robot-desc {
+      max-height: 200px;
+      opacity: 1;
+    }
+
+    /* =========================
+       CONTACT
+       ========================= */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .contact-grid { grid-template-columns: 1fr; }
+    }
+
+    .contact-card {
+      position: relative;
+      border-radius: 24px;
+      padding: 36px;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.04) 0%,
+        rgba(255, 255, 255, 0.01) 100%
+      );
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.4s ease;
+    }
+
+    .contact-card:hover {
+      border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .contact-card__title {
+      margin: 0 0 12px;
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .contact-card__text {
+      margin: 0 0 24px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+
+    .contact-icons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .contact-icons a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .contact-icons a:hover {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .contact-icons img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      opacity: 0.9;
+    }
+
+    /* =========================
+       FOOTER
+       ========================= */
+    footer {
+      position: relative;
+      padding: 60px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    /* Grass patches */
+    .grass-patch {
+      position: absolute;
+      bottom: 0;
+      display: flex;
+      gap: 3px;
+      pointer-events: none;
+    }
+
+    .grass-blade {
+      width: 3px;
+      background: linear-gradient(to top, rgba(16, 185, 129, 0.5), rgba(16, 185, 129, 0.15));
+      border-radius: 2px 2px 0 0;
+      transform-origin: bottom center;
+    }
+
+    .grass-patch-1 { left: 5%; }
+    .grass-patch-2 { left: 15%; }
+    .grass-patch-3 { right: 20%; }
+    .grass-patch-4 { right: 8%; }
+    .grass-patch-5 { left: 40%; }
+
+    .grass-patch-1 .grass-blade:nth-child(1) { height: 25px; transform: rotate(-8deg); }
+    .grass-patch-1 .grass-blade:nth-child(2) { height: 35px; transform: rotate(-2deg); }
+    .grass-patch-1 .grass-blade:nth-child(3) { height: 28px; transform: rotate(5deg); }
+    .grass-patch-1 .grass-blade:nth-child(4) { height: 20px; transform: rotate(10deg); }
+
+    .grass-patch-2 .grass-blade:nth-child(1) { height: 18px; transform: rotate(-5deg); }
+    .grass-patch-2 .grass-blade:nth-child(2) { height: 30px; transform: rotate(0deg); }
+    .grass-patch-2 .grass-blade:nth-child(3) { height: 22px; transform: rotate(7deg); }
+
+    .grass-patch-3 .grass-blade:nth-child(1) { height: 32px; transform: rotate(-6deg); }
+    .grass-patch-3 .grass-blade:nth-child(2) { height: 24px; transform: rotate(2deg); }
+    .grass-patch-3 .grass-blade:nth-child(3) { height: 38px; transform: rotate(4deg); }
+    .grass-patch-3 .grass-blade:nth-child(4) { height: 20px; transform: rotate(12deg); }
+
+    .grass-patch-4 .grass-blade:nth-child(1) { height: 22px; transform: rotate(-10deg); }
+    .grass-patch-4 .grass-blade:nth-child(2) { height: 28px; transform: rotate(-3deg); }
+    .grass-patch-4 .grass-blade:nth-child(3) { height: 18px; transform: rotate(6deg); }
+
+    .grass-patch-5 .grass-blade:nth-child(1) { height: 15px; transform: rotate(-4deg); }
+    .grass-patch-5 .grass-blade:nth-child(2) { height: 22px; transform: rotate(2deg); }
+    .grass-patch-5 .grass-blade:nth-child(3) { height: 18px; transform: rotate(8deg); }
+
+    .footer-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .footer-brand img {
+      height: 32px;
+      width: auto;
+      opacity: 0.8;
+    }
+
+    .footer-brand span {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    .footer-copy {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    /* =========================
+       RESPONSIVE
+       ========================= */
+    @media (max-width: 1000px) {
+      .team3 { grid-template-columns: 1fr; gap: 20px; }
+      .about-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      :root { --pad: 20px; }
+      
+      .nav { display: none; }
+      
+      /* Hero mobile */
+      .hero__inner { padding: 120px var(--pad) 80px; }
+      .hero__title { font-size: clamp(36px, 12vw, 52px); }
+      .hero__sub { font-size: 15px; }
+      .hero__badge { padding: 6px 12px; }
+      .hero__badge-text { font-size: 11px; }
+      .hero__cta { flex-direction: column; gap: 12px; }
+      .hero__cta .btn { width: 100%; justify-content: center; }
+      
+      /* Hide monkey on mobile - too distracting */
+      .hero-monkey { display: none; }
+      .vine-container { display: none; }
+      
+      /* Sections */
+      section.content { padding: 80px 0; }
+      .section-title { font-size: clamp(26px, 7vw, 36px); }
+      .section-header { margin-bottom: 40px; }
+      
+      /* Team */
+      .team-head { flex-direction: column; gap: 12px; }
+      .team-head__title { font-size: clamp(28px, 8vw, 40px); }
+      .team-head__note { text-align: left; max-width: 100%; }
+      
+      .pillar { padding: 20px; border-radius: 20px; }
+      .pillar__title { font-size: 20px; }
+      .person { padding: 16px; }
+      .person__name { font-size: 15px; }
+      
+      /* Cards */
+      .glass-card { padding: 24px; border-radius: 18px; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .contact-card { padding: 28px; }
+      
+      /* Hide forest decorations on mobile */
+      .forest-decor { display: none; }
+      
+      /* Footer */
+      footer { padding: 40px 0; }
+      .grass-patch { display: none; }
+      
+      /* Scroll indicator smaller */
+      .scroll-indicator { bottom: 25px; }
+      .scroll-indicator__arrow { width: 18px; height: 18px; }
+    }
+
+    @media (max-width: 480px) {
+      :root { --pad: 16px; }
+      
+      .brand__name { display: none; }
+      .brand__pill { font-size: 11px; padding: 5px 10px; }
+      .brand__logo { height: 32px; }
+      
+      .hero__title { font-size: clamp(32px, 14vw, 44px); }
+      .hero__kicker { font-size: 11px; }
+      
+      .pillar { padding: 16px; }
+      .pillar__icon { width: 40px; height: 40px; font-size: 18px; }
+      
+      .glass-card { padding: 20px; }
+      .glass-card h3 { font-size: 17px; }
+      
+      .pill { padding: 6px 10px; font-size: 11px; }
+      
+      .contact-icons { gap: 10px; }
+      .contact-icons a { width: 46px; height: 46px; }
+      
+      .btn { padding: 12px 20px; font-size: 14px; }
+    }
+
+    .anchor { scroll-margin-top: 100px; }
+
+    /* =========================
+       HERO MONKEY + VINE
+       ========================= */
+    .vine-container {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+      overflow: visible;
+    }
+
+    .vine-line {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      width: 5px;
+      height: 200vh;
+      background: linear-gradient(
+        180deg,
+        rgba(16, 185, 129, 0.7) 0%,
+        rgba(16, 185, 129, 0.5) 30%,
+        rgba(16, 185, 129, 0.3) 60%,
+        transparent 100%
+      );
+      border-radius: 3px;
+      transform-origin: top center;
+      filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.3));
+    }
+
+    .vine-line::before,
+    .vine-line::after {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 10px;
+      background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.6), rgba(16, 185, 129, 0.3));
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    }
+
+    .vine-line::before {
+      top: 80px;
+      left: -16px;
+      transform: rotate(-30deg);
+    }
+
+    .vine-line::after {
+      top: 180px;
+      right: -16px;
+      transform: rotate(30deg);
+    }
+
+    .hero-monkey {
+      position: absolute;
+      width: 85px;
+      height: auto;
+      z-index: 6;
+      transition: transform 0.15s ease-out;
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.5)) brightness(0.75);
+      transform-origin: center top;
+      animation: monkeySwing 3s ease-in-out infinite;
+    }
+
+    @keyframes monkeySwing {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+
+    /* =========================
+       FOREST DECORATION
+       ========================= */
+    .forest-decor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .branch {
+      position: absolute;
+      height: 16px;
+      background: linear-gradient(
+        90deg,
+        rgba(50, 38, 28, 0.95) 0%,
+        rgba(60, 45, 32, 0.9) 25%,
+        rgba(55, 42, 30, 0.85) 50%,
+        rgba(45, 35, 25, 0.6) 75%,
+        transparent 100%
+      );
+      border-radius: 4px 50% 40% 4px / 50% 60% 50% 50%;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+      clip-path: polygon(0% 30%, 15% 10%, 40% 20%, 60% 5%, 80% 25%, 100% 40%, 100% 70%, 85% 90%, 60% 80%, 40% 95%, 15% 75%, 0% 70%);
+    }
+
+    /* Foliage near the start of branch */
+    .branch::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: -22px;
+      width: 90px;
+      height: 50px;
+      background: 
+        radial-gradient(ellipse 18px 12px at 10% 55%, rgba(16, 185, 129, 0.55), transparent),
+        radial-gradient(ellipse 15px 10px at 25% 30%, rgba(16, 185, 129, 0.5), transparent),
+        radial-gradient(ellipse 14px 9px at 40% 65%, rgba(16, 185, 129, 0.48), transparent),
+        radial-gradient(ellipse 12px 8px at 55% 40%, rgba(16, 185, 129, 0.45), transparent),
+        radial-gradient(ellipse 10px 7px at 70% 55%, rgba(16, 185, 129, 0.4), transparent),
+        radial-gradient(ellipse 8px 6px at 85% 35%, rgba(16, 185, 129, 0.35), transparent);
+      filter: blur(0.3px);
+    }
+
+    /* Small twig sticking out */
+    .branch::after {
+      content: "";
+      position: absolute;
+      left: 60px;
+      top: -8px;
+      width: 25px;
+      height: 6px;
+      background: linear-gradient(
+        90deg,
+        rgba(55, 42, 30, 0.8) 0%,
+        rgba(45, 35, 25, 0.5) 70%,
+        transparent 100%
+      );
+      border-radius: 2px 4px 4px 2px;
+      transform: rotate(-25deg);
+    }
+
+    @keyframes vineHang {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+
+    @keyframes vineSway {
+      0%, 100% { transform: rotate(var(--vine-base-rotate, 0deg)) translateX(0); }
+      50% { transform: rotate(var(--vine-base-rotate, 0deg)) translateX(2px); }
+    }
+
+    .branch--left { left: 0; }
+    .branch--right { right: 0; transform: scaleX(-1); }
+
+    .branch-1 { top: 25vh; width: 180px; }
+    .branch-2 { top: 45vh; width: 150px; }
+    .branch-3 { top: 70vh; width: 200px; }
+    .branch-4 { top: 90vh; width: 160px; }
+
+    /* Variation per branch */
+    .branch-1::before { width: 100px; top: -25px; }
+    .branch-1::after { left: 80px; transform: rotate(-30deg); }
+    .branch-2::before { width: 85px; top: -20px; }
+    .branch-2::after { left: 50px; top: 10px; transform: rotate(20deg); }
+    .branch-3::before { width: 110px; top: -28px; }
+    .branch-3::after { left: 100px; transform: rotate(-20deg); width: 30px; }
+    .branch-4::before { width: 80px; }
+    .branch-4::after { left: 70px; top: -5px; transform: rotate(-35deg); }
+
+    /* Straight hanging vines from branches */
+    .hanging-vine {
+      position: absolute;
+      width: 2px;
+      background: linear-gradient(
+        180deg,
+        rgba(16, 185, 129, 0.55) 0%,
+        rgba(16, 185, 129, 0.35) 50%,
+        rgba(16, 185, 129, 0.15) 100%
+      );
+      border-radius: 1px;
+      animation: vineHangStraight 4s ease-in-out infinite;
+    }
+
+    @keyframes vineHangStraight {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(2deg); }
+    }
+
+    .hv-1 { left: 50px; top: calc(25vh + 14px); height: 50px; animation-delay: 0s; }
+    .hv-2 { right: 45px; top: calc(45vh + 14px); height: 60px; animation-delay: 0.8s; }
+    .hv-3 { left: 70px; top: calc(70vh + 14px); height: 45px; animation-delay: 1.6s; }
+    .hv-4 { right: 55px; top: calc(90vh + 14px); height: 40px; animation-delay: 2.4s; }
+
+    /* Extra foliage clusters - near branch starts */
+    .foliage {
+      position: absolute;
+      width: 70px;
+      height: 50px;
+      background: 
+        radial-gradient(ellipse 16px 11px at 20% 40%, rgba(16, 185, 129, 0.45), transparent),
+        radial-gradient(ellipse 14px 9px at 40% 20%, rgba(16, 185, 129, 0.4), transparent),
+        radial-gradient(ellipse 12px 8px at 60% 55%, rgba(16, 185, 129, 0.38), transparent),
+        radial-gradient(ellipse 10px 7px at 80% 30%, rgba(16, 185, 129, 0.35), transparent),
+        radial-gradient(ellipse 14px 10px at 30% 70%, rgba(16, 185, 129, 0.32), transparent);
+      pointer-events: none;
+    }
+
+    .foliage-1 { left: 0; top: calc(25vh - 30px); }
+    .foliage-2 { right: 0; top: calc(45vh - 25px); transform: scaleX(-1); }
+
+    .sliding-monkey {
+      position: fixed;
+      width: 65px;
+      height: auto;
+      z-index: 1;
+      filter: drop-shadow(0 6px 15px rgba(0,0,0,0.5));
+      transition: transform 0.4s ease-out, left 0.6s ease-out, opacity 0.4s ease;
+      opacity: 0;
+    }
+
+    .sliding-monkey.visible { opacity: 1; }
+    /* Robot arrows */
+.robot-stage{ position: relative; }
+
+.robot-nav{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(255,255,255,0.9);
+  font-size: 28px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.robot-nav:hover{
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.28);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.robot-nav:active{
+  transform: translateY(-50%) scale(0.98);
+}
+
+.robot-nav--prev{ left: 18px; }
+.robot-nav--next{ right: 18px; }
+
+@media (max-width: 768px){
+  .robot-nav{ width: 42px; height: 42px; border-radius: 12px; font-size: 26px; }
+  .robot-nav--prev{ left: 12px; }
+  .robot-nav--next{ right: 12px; }
+}
+
+.robot-kicker{
+  margin-top: -14px;   /* pushes it UP more */
+  margin-bottom: 8px;
+  font-size: 26px;     /* MUCH bigger */
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--emerald);
+  opacity: 0.95;
+}
+
+.robot-kicker__tm{
+  font-size: 0.7em;
+  vertical-align: super;
+  margin-left: 2px;
+  opacity: 0.9;
+}
+
+
+
+  </style>
+</head>
+
+<body>
+  <script>window.scrollTo(0,0);</script>
+
+  <!-- TOP NAV -->
+  <header class="topbar" id="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="#home" aria-label="Go to top">
+        <img src="assets/monke.png" alt="Rubber Bandits logo" class="brand__logo">
+        <span class="brand__name">Rubber Bandits</span>
+        <span class="brand__pill">#17288</span>
+      </a>
+
+      <nav class="nav" aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#team">Team</a>
+        <a href="#robot">Our Robot</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero hero--title" id="home">
+    <!-- Floating particles -->
+    <div class="hero-particles">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+    </div>
+
+    <div class="hero__inner">
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        <span class="hero__badge-text">FTC Team #17288</span>
+      </div>
+      
+      <h1 class="hero__title">Rubber<br>Bandits</h1>
+      
+      <p class="hero__sub">
+        Building robots, solving challenges, and inspiring the next generation of innovators through creativity and teamwork.
+      </p>
+
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="#contact">Get in Touch</a>
+      </div>
+    </div>
+
+    <a class="scroll-indicator" href="#about" aria-label="Scroll down">
+      <div class="scroll-indicator__arrow"></div>
+    </a>
+
+    <!-- Hero Monkey -->
+    <div class="vine-container" id="vineContainer">
+      <img src="assets/monkeke.png" alt="Hanging monkey" class="hero-monkey" id="heroMonkey">
+    </div>
+  </section>
+
+  <!-- Forest decoration -->
+  <div class="forest-decor" id="forestDecor">
+    <div class="branch branch--left branch-1"></div>
+    <div class="branch branch--left branch-3"></div>
+    <div class="branch branch--right branch-2"></div>
+    <div class="branch branch--right branch-4"></div>
+    
+    <!-- Hanging vines -->
+    <div class="hanging-vine hv-1"></div>
+    <div class="hanging-vine hv-2"></div>
+    <div class="hanging-vine hv-3"></div>
+    <div class="hanging-vine hv-4"></div>
+    
+    <!-- Extra foliage -->
+    <div class="foliage foliage-1"></div>
+    <div class="foliage foliage-2"></div>
+    
+    <img src="assets/monkey.png" alt="Monkey on branch" class="sliding-monkey" id="slidingMonkey">
+  </div>
+
+  <!-- ABOUT -->
+  <section class="content anchor" id="about">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Behind the Bandits</span>
+        <h2 class="section-title">About Our Team</h2>
+        <p class="section-sub">Driven by curiosity, united by passion for robotics and innovation.</p>
+      </div>
+
+      <div class="about-grid">
+        <div class="glass-card reveal reveal-delay-1">
+          <h3>Our Mission</h3>
+          <p>
+            We are FTC Team #17288, the Rubber Bandits — a dedicated FIRST Tech Challenge team fueled by curiosity, creativity, and hands-on problem solving. We design, build, and program innovative robots, always pushing the boundaries of technology and teamwork.
+          </p>
+          <p style="margin-top: 16px;">
+            Beyond competitions, we strive to inspire others, share our passion for STEM, and empower the next generation of innovators to explore, learn, and create.
+          </p>
+            <p style="margin-top: 16px;">Our mission extends beyond building a competitive robot. We aim to create an environment where team members learn practical engineering skills, develop problem-solving confidence, and collaborate effectively under real constraints. Through outreach, mentorship, and community engagement, we work to make STEM more accessible and encourage others to pursue curiosity-driven learning.</p>
+          <div style="margin-top: 20px;">
+            <span class="pill">Gracious Professionalism®</span>
+            <span class="pill">Innovation</span>
+            <span class="pill">Teamwork</span>
+            <span class="pill">Community Impact</span>
+          </div>
+        </div>
+
+        <div class="glass-card reveal reveal-delay-2">
+          <h3>Quick Facts</h3>
+          <div class="facts-list">
+            <div class="fact-item">
+              <div class="fact-icon">📍</div>
+              <div class="fact-content">
+                <strong>Location</strong>
+                <span>Orlando, Florida</span>
+              </div>
+            </div>
+            <div class="fact-item">
+              <div class="fact-icon">🚀</div>
+              <div class="fact-content">
+                <strong>Founded</strong>
+                <span>2019</span>
+              </div>
+            </div>
+            <div class="fact-item">
+              <div class="fact-icon">👥</div>
+              <div class="fact-content">
+                <strong>Team Size</strong>
+                <span>11 Dedicated Members</span>
+              </div>
+            </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="content anchor" id="team">
+    <div class="container">
+      <div class="team-head reveal">
+        <h2 class="team-head__title">The Bandits</h2>
+        <p class="team-head__note">Three core pillars driving our team: Software, Mechanical, and Outreach.</p>
+      </div>
+
+      <div class="team3">
+        <!-- Software -->
+        <article class="pillar reveal reveal-delay-1">
+          <header class="pillar__head">
+            <h3 class="pillar__title">Software</h3>
+            <p class="pillar__sub">Autonomy, vision, controls, and tooling.</p>
+          </header>
+
+          <div class="pillar__list">
+            <div class="person">
+              <div class="person__name">Varun Dasari</div>
+              <div class="person__role">Software Lead</div>
+              <div class="person__desc">
+                Leads software development using Java and Android Studio, specializing in autonomous programming, computer vision, and overall system architecture.
+              </div>
+            </div>
+
+            <div class="person">
+              <div class="person__name">Sathwik Dasari</div>
+              <div class="person__desc">
+                Develops autonomous routines and fine-tunes control parameters to optimize consistency, accuracy, and robot performance.
+              </div>
+            </div>
+
+            <div class="person">
+              <div class="person__name">Anushka Sinha</div>
+              <div class="person__desc">
+                Focuses on driver-controlled programming, sensor integration and telemetry dashboards.
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Mechanical -->
+        <article class="pillar reveal reveal-delay-2">
+          <header class="pillar__head">
+            <h3 class="pillar__title">Mechanical</h3>
+            <p class="pillar__sub">Design, CAD, fabrication, and build.</p>
+          </header>
+
+          <div class="pillar__list">
+            <div class="person">
+              <div class="person__name">Darian Jones</div>
+              <div class="person__role">Mechanical Lead</div>
+              <div class="person__desc">
+                Leads overall robot design, coordinates subsystem integration, and manages iteration based on testing, reliability, and competition feedback.
+              </div>
+            </div>
+
+            <div class="person">
+              <div class="person__name">Shriyansh Matha</div>
+              <div class="person__desc">
+                Designs detailed CAD models and fabricates robot components, translating concepts into functional mechanisms through hands-on building.
+              </div>
+            </div>
+
+            <div class="person">
+              <div class="person__name">Jennifer Chen</div>
+              <div class="person__desc">
+                Focuses on hands-on assembly, mechanism construction, and physical iteration to ensure durability and performance.
+              </div>
+            </div>
+
+            <div class="person">
+              <div class="person__name">Abigail He</div>
+              <div class="person__desc">
+                Supports fabrication and assembly, assists with testing, and refines mechanisms through practical, hands-on problem solving.
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Outreach -->
+        <article class="pillar reveal reveal-delay-3">
+          <header class="pillar__head">
+            <h3 class="pillar__title">Outreach</h3>
+            <p class="pillar__sub">Brand, community, sponsors, and events.</p>
+          </header>
+
+          <div class="pillar__list">
+            <div class="person">
+              <div class="person__name">Lakshmi Kataru</div>
+              <div class="person__role">Outreach Lead</div>
+              <div class="person__desc">
+                Leads community outreach and partnership development, organizes STEM events for local schools, and coordinates award submissions.
+              </div>
+            </div>
+
+            <div class="person">
+              <div class="person__name">Misha Goli</div>
+              <div class="person__desc">
+                Researches grant opportunities, prepares funding applications, and manages documentation to support long-term financial sustainability.
+              </div>
+            </div>
+
+            <div class="person">
+              <div class="person__name">Aarush Kondabala</div>
+              <div class="person__desc">
+                Manages team media, social platforms, photography, and digital content to document team progress and competition highlights.
+              </div>
+            </div>
+
+            <div class="person">
+              <div class="person__name">Aayan Patel</div>
+              <div class="person__desc">
+                Develops and maintains sponsor relationships, handles outreach to partners, and supports fundraising efforts.
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- COACHES -->
+  <section class="content anchor" id="coaches">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Mentorship</span>
+        <h2 class="section-title">Our Coaches</h2>
+        <p class="section-sub">Guiding, supporting, and challenging us throughout the season.</p>
+      </div>
+
+      <div class="coaches-box">
+        <div class="coaches-wrap">
+          <div class="coach-card reveal reveal-delay-1">
+            <div class="coach-name">Stephen Whitfield</div>
+            <div class="coach-role">Head Coach</div>
+            <div class="coach-desc">
+              Serves as the head coach for seven FTC teams at Orlando Science High School, including Rubber Bandits, providing overarching leadership, structure, and guidance throughout the season. He works closely with teams to discuss design ideas, evaluate mechanical and software approaches, and help students think through effective solutions.
+            </div>
+          </div>
+
+          <div class="coach-card reveal reveal-delay-2">
+            <div class="coach-name">Giovanni Silvestri</div>
+            <div class="coach-role">Assistant Coach</div>
+            <div class="coach-desc">
+              Supports the team by working alongside the head coach, observing team progress, and providing guidance as needed. He helps reinforce organization, offers feedback during build and planning sessions, and assists teams in staying focused and prepared throughout the season.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROBOT -->
+  <section class="content anchor" id="robot">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Engineering</span>
+        <h2 class="section-title">Our Robot</h2>
+<div class="robot-kicker">Thwackey <span class="robot-kicker__tm">©</span></div>
+<p class="section-sub">Designed, built, and iterated throughout the season.</p>
+
+      </div>
+
+      <div class="robot-showcase">
+        <div class="robot-card reveal">
+          <div class="robot-image-wrap">
+                <button class="robot-nav robot-nav--prev" type="button" aria-label="Previous robot image">‹</button>
+                <button class="robot-nav robot-nav--next" type="button" aria-label="Next robot image">›</button>
+
+                <div class="robot-stage">
+                    <img src="assets/cad 1.png" alt="FTC 17288 Robot" class="robot-image" id="robotImage" />
+                </div>
+                </div>
+
+
+          <div class="robot-info">
+            <div class="robot-desc">
+              Our robot represents the third iteration of our design process, building on lessons learned from earlier prototypes to maximize speed and reliability. It features a spindexer capable of fast cycling, with the added potential for color sorting to support advanced game strategy. Designed for versatility, the robot can burst shoot accurately from both close and long range, adapting to different field positions. Staying true to our name, the Rubber Bandits, the robot uses a rubber band–powered intake that is simple, effective, and consistent.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="content anchor" id="contact">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Connect</span>
+        <h2 class="section-title">Get In Touch</h2>
+        <p class="section-sub">Questions, partnerships, or just want to say hello? We'd love to hear from you.</p>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-card reveal reveal-delay-1">
+          <h3 class="contact-card__title">Reach Out</h3>
+          <p class="contact-card__text">
+            Have questions about our robot or interested in partnership opportunities? Connect with us through any of our platforms.
+          </p>
+          <div class="contact-icons">
+            <a href="mailto:ftc17288@gmail.com" aria-label="Email">
+              <img src="assets/gmail.png" alt="Gmail" />
+            </a>
+            <a href="https://www.instagram.com/ftc17288" target="_blank" aria-label="Instagram">
+              <img src="assets/instagram.png" alt="Instagram" />
+            </a>
+            <a href="https://www.tiktok.com/@ftc.17288.rubber" target="_blank" aria-label="TikTok">
+              <img src="assets/tiktok.png" alt="TikTok" />
+            </a>
+            <a href="https://www.linkedin.com/in/ftc-rubber-bandits-10469b328/" target="_blank" aria-label="LinkedIn">
+              <img src="assets/linkdin.png" alt="LinkedIn" />
+            </a>
+          </div>
+        </div>
+
+        <div class="contact-card reveal reveal-delay-2">
+          <h3 class="contact-card__title">Support Our Team</h3>
+          <p class="contact-card__text">
+            Your sponsorship helps us compete and inspire future STEM leaders. In return, we showcase your logo on our robot, portfolio, and pit displays for hundreds to see.
+          </p>
+          <a class="btn btn--primary" href="mailto:ftc17288@gmail.com">
+            Become a Sponsor
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <!-- Grass patches -->
+    <div class="grass-patch grass-patch-1">
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+    </div>
+    <div class="grass-patch grass-patch-2">
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+    </div>
+    <div class="grass-patch grass-patch-3">
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+    </div>
+    <div class="grass-patch grass-patch-4">
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+    </div>
+    <div class="grass-patch grass-patch-5">
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+      <div class="grass-blade"></div>
+    </div>
+
+    <div class="container">
+      <div class="footer-brand">
+        <img src="assets/monke.png" alt="Rubber Bandits" />
+        <span>Rubber Bandits</span>
+      </div>
+      <p class="footer-copy">© 2025-2026 Rubber Bandits - FTC Team #17288. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Force scroll to top immediately
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    
+    // Ensure page starts at top on load
+    window.addEventListener('DOMContentLoaded', () => {
+      window.scrollTo(0, 0);
+    });
+    
+    window.addEventListener('load', () => {
+      window.scrollTo(0, 0);
+      // Restore smooth scrolling after page loads
+      setTimeout(() => {
+        document.documentElement.style.scrollBehavior = 'smooth';
+      }, 100);
+    });
+    
+    // Clear any hash in URL
+    if (window.location.hash) {
+      history.replaceState(null, null, window.location.pathname);
+      window.scrollTo(0, 0);
+    }
+
+    // Scroll reveal animation
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Navbar scroll effect
+    const topbar = document.getElementById('topbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        topbar.classList.add('scrolled');
+      } else {
+        topbar.classList.remove('scrolled');
+      }
+    });
+
+    // =====================
+    // HERO MONKEY CURSOR FOLLOWER
+    // =====================
+    const heroSection = document.querySelector('.hero--title');
+    const heroMonkey = document.getElementById('heroMonkey');
+    
+    // Start monkey in upper right corner
+    let mouseX = window.innerWidth - 150;
+    let mouseY = 120;
+    let monkeyX = window.innerWidth - 150;
+    let monkeyY = 120;
+    
+    function animateHeroMonkey() {
+      const ease = 0.04;
+      monkeyX += (mouseX - monkeyX) * ease;
+      monkeyY += (mouseY - monkeyY) * ease;
+      
+      const heroRect = heroSection.getBoundingClientRect();
+      const constrainedX = Math.max(60, Math.min(window.innerWidth - 60, monkeyX));
+      const constrainedY = Math.max(100, Math.min(heroRect.height - 100, monkeyY));
+      
+      heroMonkey.style.left = constrainedX - 42 + 'px';
+      heroMonkey.style.top = constrainedY + 'px';
+      
+      requestAnimationFrame(animateHeroMonkey);
+    }
+    
+    heroSection.addEventListener('mousemove', (e) => {
+      const rect = heroSection.getBoundingClientRect();
+      mouseX = e.clientX;
+      mouseY = e.clientY - rect.top;
+    });
+    
+    animateHeroMonkey();
+
+    // =====================
+    // SLIDING MONKEY ON SCROLL
+    // =====================
+    const forestDecor = document.getElementById('forestDecor');
+    const slidingMonkey = document.getElementById('slidingMonkey');
+    
+    const branchPositions = [
+      { top: '25vh', left: 120, side: 'left' },
+      { top: '45vh', right: 90, side: 'right' },
+      { top: '70vh', left: 140, side: 'left' },
+      { top: '90vh', right: 100, side: 'right' }
+    ];
+    
+    function updateSlidingMonkey() {
+      const scrollY = window.scrollY;
+      const heroHeight = heroSection.offsetHeight;
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      
+      if (scrollY > heroHeight * 0.8) {
+        forestDecor.style.opacity = '1';
+        slidingMonkey.classList.add('visible');
+      } else {
+        forestDecor.style.opacity = '0';
+        slidingMonkey.classList.remove('visible');
+      }
+      
+      const scrollAfterHero = Math.max(0, scrollY - heroHeight);
+      const remainingScroll = docHeight - heroHeight;
+      const progress = remainingScroll > 0 ? scrollAfterHero / remainingScroll : 0;
+      
+      const branchCount = branchPositions.length;
+      const newIndex = Math.min(Math.floor(progress * branchCount), branchCount - 1);
+      
+      const branch = branchPositions[Math.max(0, newIndex)];
+      const viewportHeight = window.innerHeight;
+      const topVh = parseFloat(branch.top);
+      const topPx = (topVh / 100) * viewportHeight;
+      
+      slidingMonkey.style.top = topPx - 10 + 'px';
+      
+      if (branch.side === 'left') {
+        slidingMonkey.style.left = branch.left + 'px';
+        slidingMonkey.style.right = 'auto';
+        slidingMonkey.style.transform = 'scaleX(1) rotate(-5deg)';
+      } else {
+        slidingMonkey.style.left = 'auto';
+        slidingMonkey.style.right = branch.right + 'px';
+        slidingMonkey.style.transform = 'scaleX(-1) rotate(5deg)';
+      }
+    }
+    
+    let scrollTicking = false;
+    window.addEventListener('scroll', () => {
+      if (!scrollTicking) {
+        requestAnimationFrame(() => {
+          updateSlidingMonkey();
+          scrollTicking = false;
+        });
+        scrollTicking = true;
+      }
+    });
+    
+    updateSlidingMonkey();
+    forestDecor.style.opacity = '0';
+    forestDecor.style.transition = 'opacity 0.5s ease';
+
+    // =====================
+// OUR ROBOT: 2-IMAGE SWITCHER (loads safely)
+// =====================
+(() => {
+  const img = document.getElementById('robotImage');
+  if (!img) return;
+
+  const prev = document.querySelector('#robot .robot-nav--prev');
+  const next = document.querySelector('#robot .robot-nav--next');
+
+  // ✅ Put your real 2 image paths here (exact filenames)
+  const images = [
+    'assets/cad 1.png',
+    'assets/cad 2.jpeg'
+  ];
+
+  let i = 0;
+
+  function show(index) {
+    i = (index + images.length) % images.length;
+    const newSrc = images[i];
+
+    // fade out
+    img.style.transition = 'opacity 0.2s ease';
+    img.style.opacity = '0';
+
+    // preload next image
+    const pre = new Image();
+    pre.onload = () => {
+      img.src = newSrc;
+      img.style.opacity = '1';
+    };
+    pre.onerror = () => {
+      console.log('Robot image not found:', newSrc);
+      img.style.opacity = '1';
+      alert('Could not load: ' + newSrc + '\nCheck the filename/path in assets.');
+    };
+    pre.src = newSrc;
+  }
+
+  prev?.addEventListener('click', () => show(i - 1));
+  next?.addEventListener('click', () => show(i + 1));
+
+  // start on whatever is currently in the HTML <img src="...">
+  const current = img.getAttribute('src');
+  const startIndex = images.indexOf(current);
+  i = startIndex >= 0 ? startIndex : 0;
+})();
+
+
+  </script>
+</body>
+</html>

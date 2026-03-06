@@ -170,12 +170,10 @@ if (menuToggle && navLinks) {
   });
 }
 
-// Mobile dropdown open/close for Team and Robot
 document.querySelectorAll('.mobile-parent > .nav-link').forEach(label => {
   label.addEventListener('click', () => {
     if (window.innerWidth <= 900) {
-      const parent = label.parentElement;
-      parent.classList.toggle('mobile-open');
+      label.parentElement.classList.toggle('mobile-open');
     }
   });
 });

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Iteration 2 • Rubber Bandits #17288</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header class="topbar" id="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="index.html" aria-label="Go to home">
+        <img src="assets/monke.png" alt="Rubber Bandits logo" class="brand__logo">
+        <span class="brand__name">Rubber Bandits</span>
+        <span class="brand__pill">#17288</span>
+      </a>
+
+   <nav class="nav" aria-label="Primary">
+  <button class="menu-toggle" id="menuToggle" aria-label="Open navigation" type="button">
+    ☰
+  </button>
+
+  <div class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+
+    <div class="nav-dropdown mobile-parent">
+      <span class="nav-link">Team</span>
+      <div class="dropdown-menu">
+        <a href="about-team.html">About Our Team</a>
+        <a href="core-values.html">Core Values</a>
+        <a href="awards.html">Awards</a>
+        <a href="members.html">Members</a>
+        <a href="mentors.html">Mentors</a>
+      </div>
+    </div>
+
+    <div class="nav-dropdown mobile-parent">
+      <span class="nav-link">Robot</span>
+      <div class="dropdown-menu">
+        <a href="iteration-1.html">Iteration 1</a>
+        <a href="iteration-2.html">Iteration 2</a>
+        <a href="iteration-3.html">Iteration 3</a>
+        <a href="iteration-4.html">Iteration 4</a>
+      </div>
+    </div>
+
+    <a href="community.html">Community</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+    </div>
+  </header>
+
+  <section class="content" style="padding-top:140px;">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Engineering</span>
+        <h2 class="section-title">Robot Iteration 2</h2>
+        <div class="robot-kicker">Grookey<span class="robot-kicker__tm">©</span></div>
+        <p class="section-sub">Refined design — stronger mechanisms and better consistency.</p>
+      </div>
+
+      <div class="robot-showcase">
+        <div class="robot-card reveal">
+          <div class="robot-image-wrap">
+            <button class="robot-nav robot-nav--prev" type="button" aria-label="Previous robot image">‹</button>
+            <button class="robot-nav robot-nav--next" type="button" aria-label="Next robot image">›</button>
+
+            <div class="robot-stage">
+              <img src="assets/iteration2.png" alt="FTC 17288 Robot Iteration 2" class="robot-image" id="robotImage" />
+            </div>
+          </div>
+
+          <div class="robot-info">
+            <div class="robot-desc">
+              Iteration 2 improved reliability and performance based on our Iteration 1 testing.
+              We strengthened key subsystems, reduced failure points, and optimized the build for faster cycles.
+              This version helped us validate upgrades before our final competition-ready design.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-brand">
+        <img src="assets/monke.png" alt="Rubber Bandits" />
+        <span>Rubber Bandits</span>
+      </div>
+      <p class="footer-copy">© 2025-2026 Rubber Bandits - FTC Team #17288. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

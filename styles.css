@@ -1028,7 +1028,7 @@
     @media (max-width: 768px) {
       :root { --pad: 20px; }
       
-      .nav { display: none; }
+      .nav { display: flex; }
       
       /* Hero mobile */
       .hero__inner { padding: 120px var(--pad) 80px; }

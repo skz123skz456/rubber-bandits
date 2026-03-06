@@ -171,3 +171,16 @@ document.querySelectorAll('.award-card').forEach(card => {
   });
 
 });
+
+/* =============================
+Mobile menu toggle
+============================= */
+
+const toggle = document.getElementById("menuToggle");
+const navLinks = document.getElementById("navLinks");
+
+if(toggle){
+  toggle.addEventListener("click", () => {
+    navLinks.classList.toggle("active");
+  });
+}

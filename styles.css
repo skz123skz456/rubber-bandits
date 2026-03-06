@@ -1868,3 +1868,54 @@
 .initiative-card.is-open .initiative-overlay{
   opacity: 1;
 }
+
+/* ============================= */
+/* MOBILE NAVIGATION */
+/* ============================= */
+
+.menu-toggle{
+  display:none;
+  font-size:28px;
+  cursor:pointer;
+  color:white;
+}
+
+.nav-links{
+  display:flex;
+  gap:20px;
+}
+
+/* mobile */
+@media (max-width:900px){
+
+  .menu-toggle{
+    display:block;
+  }
+
+  .nav-links{
+    position:absolute;
+    top:70px;
+    left:0;
+    width:100%;
+    background:rgba(0,0,0,0.95);
+
+    flex-direction:column;
+    align-items:center;
+
+    max-height:0;
+    overflow:hidden;
+
+    transition:max-height 0.35s ease;
+  }
+
+  .nav-links.active{
+    max-height:500px;
+  }
+
+  .nav-links a{
+    padding:15px;
+    width:100%;
+    text-align:center;
+  }
+
+}

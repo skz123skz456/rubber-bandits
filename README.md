@@ -1,2 +1,2 @@
 # rubber-bandits
-Ruber Bandaids - Robotics Team
+Rubber Bandits - Robotics Team
